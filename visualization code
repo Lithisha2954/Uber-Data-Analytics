@@ -1,0 +1,98 @@
+pip install pyhive sqlalchemy pandas
+pip install thrift_sasl
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+df = pd.read_csv('yellownew1.csv') 
+
+vendor_count = df['VendorID'].value_counts()
+plt.figure(figsize=(6,4))
+sns.barplot(x=vendor_count.index, y=vendor_count.values, palette="viridis")
+plt.title('Number of Trips by Vendor')
+plt.xlabel('Vendor ID')
+plt.ylabel('Number of Trips')
+plt.show()
+
+toll_sum = df['tolls_amount'].sum()
+total_sum = df['total_amount'].sum()
+toll_to_total_ratio = (toll_sum / total_sum) * 100
+
+print(f"Toll Charges contribute {toll_to_total_ratio:.2f}% to the Total Amount.")
+
+payment_group = df.groupby('payment_type').agg({
+    'fare_amount': 'mean',
+    'tip_amount': 'mean',
+    'total_amount': 'mean'
+}).reset_index()
+
+plt.figure(figsize=(10,6))
+payment_group.set_index('payment_type')[['fare_amount', 'tip_amount', 'total_amount']].plot(kind='bar')
+plt.title('Average Fare, Tip, and Total by Payment Type')
+plt.xlabel('Payment Type')
+plt.ylabel('Average Amount ($)')
+plt.xticks(rotation=0)
+plt.grid(True)
+plt.legend(title="Amount Type")
+plt.show()
+
+vendor_counts = df['VendorID'].value_counts()
+
+plt.figure(figsize=(6,4))
+sns.barplot(x=vendor_counts.index, y=vendor_counts.values, palette="mako")
+plt.title('Number of Trips by Vendor ID')
+plt.xlabel('Vendor ID')
+plt.ylabel('Number of Trips')
+plt.grid(True)
+plt.show()
+
+payment_counts = df['payment_type'].value_counts()
+
+plt.figure(figsize=(6,4))
+sns.barplot(x=payment_counts.index, y=payment_counts.values, palette="rocket")
+plt.title('Number of Trips by Payment Type')
+plt.xlabel('Payment Type')
+plt.ylabel('Number of Trips')
+plt.grid(True)
+plt.show()
+
+fare_sum = df['fare_amount'].sum()
+tip_sum = df['tip_amount'].sum()
+toll_sum = df['tolls_amount'].sum()
+
+plt.figure(figsize=(6,6))
+plt.pie([fare_sum, tip_sum, toll_sum], labels=['Fare', 'Tip', 'Toll'], autopct='%1.1f%%', colors=['skyblue', 'lightgreen', 'salmon'], startangle=90)
+plt.title('Revenue Contribution')
+plt.show()
+
+plt.figure(figsize=(8,5))
+sns.histplot(df['trip_distance'], bins=30, kde=True, color='mediumpurple')
+plt.title('Distribution of Trip Distances')
+plt.xlabel('Trip Distance (miles)')
+plt.ylabel('Number of Trips')
+plt.grid(True)
+plt.show()
+
+avg_tip = df['tip_amount'].mean()
+avg_fare = df['fare_amount'].mean()
+
+plt.figure(figsize=(6,4))
+plt.bar(['Average Tip', 'Average Fare'], [avg_tip, avg_fare], color=['lightcoral', 'mediumseagreen'])
+plt.title('Average Tip vs Average Fare')
+plt.ylabel('Amount ($)')
+plt.show()
+
+toll_total_ratio = (df['tolls_amount'].sum() / df['total_amount'].sum()) * 100
+
+print(f"Toll Amount contributes {toll_total_ratio:.2f}% to the Total Revenue.")
+
+payment_tip = df.groupby('payment_type')['tip_amount'].mean().reset_index()
+
+plt.figure(figsize=(6,4))
+sns.barplot(x='payment_type', y='tip_amount', data=payment_tip, palette='coolwarm')
+plt.title('Average Tip Amount by Payment Type')
+plt.xlabel('Payment Type')
+plt.ylabel('Average Tip ($)')
+plt.grid(True)
+plt.show()
+
+
